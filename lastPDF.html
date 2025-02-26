@@ -63,37 +63,17 @@
         </ul>
 
         <h2>Data Table</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Role</th>
-                    <th>Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>John Doe</td>
-                    <td>Developer</td>
-                    <td>john.doe@example.com</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Jane Smith</td>
-                    <td>Designer</td>
-                    <td>jane.smith@example.com</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Sam Wilson</td>
-                    <td>Manager</td>
-                    <td>sam.wilson@example.com</td>
-                </tr>
-            </tbody>
-        </table>
-
+<table id="dynamic-table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Item Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Rows will be dynamically added here -->
+    </tbody>
+</table>
         <button class="no-print" onclick="generatePDF()">Download as PDF</button>
     </div>
 
@@ -138,6 +118,66 @@
         console.error('Error generating PDF:', error);
     });
 }
+       // Function to extract query parameters from the URL
+function getQueryParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
+
+// Function to populate the table dynamically
+function populateTable(items) {
+    const tableBody = document.querySelector('#dynamic-table tbody');
+
+    // Clear any existing rows
+    tableBody.innerHTML = '';
+
+    // Loop through the items and create table rows
+    items.forEach((item, index) => {
+        const row = document.createElement('tr');
+
+        // Add the row number
+        const cellIndex = document.createElement('td');
+        cellIndex.textContent = index + 1;
+        row.appendChild(cellIndex);
+
+        // Add the item name
+        const cellName = document.createElement('td');
+        cellName.textContent = item;
+        row.appendChild(cellName);
+
+        // Append the row to the table body
+        tableBody.appendChild(row);
+    });
+}
+
+// Update the page content on load
+document.addEventListener('DOMContentLoaded', () => {
+    // Extract custom text (if any)
+    const customText = getQueryParameter('text');
+    if (customText) {
+        document.getElementById('custom-text').textContent = decodeURIComponent(customText);
+    }
+
+    // Extract the list of items (comma-separated string)
+    const itemsParam = getQueryParameter('items');
+    if (itemsParam) {
+        // Split the string into an array of items
+        const items = itemsParam.split(',');
+
+        // Populate the table with the items
+        populateTable(items);
+    } else {
+        // Fallback message if no items are provided
+        const tableBody = document.querySelector('#dynamic-table tbody');
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 2;
+        cell.textContent = 'No items to display.';
+        row.appendChild(cell);
+        tableBody.appendChild(row);
+    }
+});
+        }
     </script>
     <!-- Include html2canvas library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>

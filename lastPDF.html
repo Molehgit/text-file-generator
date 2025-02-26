@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML to PDF Example</title>
+    <style>
+        /* Styling for better PDF output */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        @media print {
+            /* Hide unnecessary elements during printing */
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Sample Document</h1>
+    <div class="content">
+        <p id="custom-text">This is the default text. Replace it with your custom text.</p>
+
+        <h2>Key Features</h2>
+        <ul>
+            <li>Structured layout for readability.</li>
+            <li>Print-friendly CSS styles.</li>
+            <li>Table data for demonstration purposes.</li>
+        </ul>
+
+        <h2>Data Table</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>John Doe</td>
+                    <td>Developer</td>
+                    <td>john.doe@example.com</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Jane Smith</td>
+                    <td>Designer</td>
+                    <td>jane.smith@example.com</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Sam Wilson</td>
+                    <td>Manager</td>
+                    <td>sam.wilson@example.com</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button class="no-print" onclick="generatePDF()">Download as PDF</button>
+    </div>
+
+    <!-- Include jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Function to extract query parameters from the URL
+        function getQueryParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Update the custom text on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const customText = getQueryParameter('text');
+            if (customText) {
+                document.getElementById('custom-text').textContent = decodeURIComponent(customText);
+            }
+        });
+
+        function generatePDF() {
+    const { jsPDF } = window.jspdf;
+
+    // Create a new jsPDF instance
+    const doc = new jsPDF();
+
+    // Get the HTML content to convert
+    const content = document.querySelector('.content');
+
+    // Convert HTML to canvas using html2canvas
+    html2canvas(content).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 210; // A4 width in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        // Add the image to the PDF
+        doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+        // Save the PDF with the correct filename and extension
+        doc.save('output.pdf'); // Ensure the file has a .pdf extension
+    }).catch(error => {
+        console.error('Error generating PDF:', error);
+    });
+}
+    </script>
+    <!-- Include html2canvas library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</body>
+</html>

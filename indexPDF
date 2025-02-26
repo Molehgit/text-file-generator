@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <script>
+        function downloadPDF() {
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const content = urlParams.get("content-data") || "No content provided";
+            const filename = urlParams.get("file-name") || "download.pdf";
+
+            // Initialize jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add text to PDF (decode URL encoding)
+            doc.text(decodeURIComponent(content), 10, 10);
+
+            // Save the PDF
+            doc.save(filename);
+        }
+
+        // Generate PDF on page load
+        downloadPDF();
+    </script>
+</body>
+</html>

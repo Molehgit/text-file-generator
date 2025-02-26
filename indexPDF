@@ -12,7 +12,12 @@
             // Get URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             const content = urlParams.get("content-data") || "No content provided";
-            const filename = urlParams.get("file-name") || "download.pdf";
+            let filename = urlParams.get("file-name") || "download.pdf";
+
+            // Ensure the filename ends with .pdf
+            if (!filename.toLowerCase().endsWith(".pdf")) {
+                filename += ".pdf";
+            }
 
             // Initialize jsPDF
             const { jsPDF } = window.jspdf;
@@ -21,8 +26,15 @@
             // Add text to PDF (decode URL encoding)
             doc.text(decodeURIComponent(content), 10, 10);
 
-            // Save the PDF
-            doc.save(filename);
+            // Create a Blob and download manually (Ensures correct extension)
+            const pdfBlob = doc.output("blob");
+            const blobUrl = URL.createObjectURL(pdfBlob);
+            const link = document.createElement("a");
+            link.href = blobUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         // Generate PDF on page load

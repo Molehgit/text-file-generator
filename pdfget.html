@@ -77,13 +77,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         // Function to extract query parameters from the URL
-        function getQueryParameter(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
+        // Function to extract query parameters from the URL
+function getQueryParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
 
-        // Function to populate the table dynamically
-        // Function to populate the table dynamically
+// Function to populate the table dynamically
 function populateTable(data) {
     const tableBody = document.querySelector('#dynamic-table tbody');
 
@@ -91,7 +91,7 @@ function populateTable(data) {
     tableBody.innerHTML = '';
 
     if (!data) {
-        // Fallback message if no data is provided
+        console.error('No data provided in the query parameter.');
         const row = document.createElement('tr');
         const cell = document.createElement('td');
         cell.colSpan = 4; // Span across all columns
@@ -101,8 +101,12 @@ function populateTable(data) {
         return;
     }
 
+    console.log('Raw Data:', data);
+
     // Split the data into rows (each row is separated by '|')
     const rows = data.split('|');
+
+    console.log('Parsed Rows:', rows);
 
     // Loop through the rows and create table rows
     rows.forEach((row, index) => {
@@ -111,6 +115,8 @@ function populateTable(data) {
 
         // Split each row into columns (each column is separated by ',')
         const [itemName, color, quantity] = trimmedRow.split(',');
+
+        console.log(`Row ${index + 1}:`, { itemName, color, quantity });
 
         // Create a new table row
         const tr = document.createElement('tr');
@@ -138,6 +144,17 @@ function populateTable(data) {
         // Append the row to the table body
         tableBody.appendChild(tr);
     });
+}
+
+// Update the page content on load
+document.addEventListener('DOMContentLoaded', () => {
+    // Extract the structured data for the table
+    const dataParam = getQueryParameter('items');
+    console.log('Query Parameter (items):', dataParam);
+
+    populateTable(dataParam);
+});
+
     
         // Function to generate PDF
         function generatePDF() {

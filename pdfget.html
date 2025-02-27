@@ -53,7 +53,7 @@
 <body>
     <h1>Dynamic Table to PDF</h1>
     <div class="content">
-        <p id="custom-text">This is the default textsss. Replace it with your custom text.</p>
+        <p id="custom-text">This is the default text. Replace it with your custom text.</p>
 
         <h2>Data Table</h2>
         <table id="dynamic-table">
@@ -83,72 +83,62 @@
         }
 
         // Function to populate the table dynamically
-        function populateTable(data) {
-            const tableBody = document.querySelector('#dynamic-table tbody');
+        // Function to populate the table dynamically
+function populateTable(data) {
+    const tableBody = document.querySelector('#dynamic-table tbody');
 
-            // Clear any existing rows
-            tableBody.innerHTML = '';
+    // Clear any existing rows
+    tableBody.innerHTML = '';
 
-            if (!data) {
-                // Fallback message if no data is provided
-                const row = document.createElement('tr');
-                const cell = document.createElement('td');
-                cell.colSpan = 4; // Span across all columns
-                cell.textContent = 'No data to display.';
-                row.appendChild(cell);
-                tableBody.appendChild(row);
-                return;
-            }
+    if (!data) {
+        // Fallback message if no data is provided
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 4; // Span across all columns
+        cell.textContent = 'No data to display.';
+        row.appendChild(cell);
+        tableBody.appendChild(row);
+        return;
+    }
 
-            // Split the data into rows (each row is separated by '|')
-            const rows = data.split('|');
+    // Split the data into rows (each row is separated by '|')
+    const rows = data.split('|');
 
-            // Loop through the rows and create table rows
-            rows.forEach((row, index) => {
-                // Split each row into columns (each column is separated by ',')
-                const [itemName, color, quantity] = row.split(',');
+    // Loop through the rows and create table rows
+    rows.forEach((row, index) => {
+        // Trim each row to remove extra spaces
+        const trimmedRow = row.trim();
 
-                // Create a new table row
-                const tr = document.createElement('tr');
+        // Split each row into columns (each column is separated by ',')
+        const [itemName, color, quantity] = trimmedRow.split(',');
 
-                // Add the row number
-                const cellIndex = document.createElement('td');
-                cellIndex.textContent = index + 1;
-                tr.appendChild(cellIndex);
+        // Create a new table row
+        const tr = document.createElement('tr');
 
-                // Add the item name
-                const cellName = document.createElement('td');
-                cellName.textContent = itemName || 'N/A';
-                tr.appendChild(cellName);
+        // Add the row number
+        const cellIndex = document.createElement('td');
+        cellIndex.textContent = index + 1;
+        tr.appendChild(cellIndex);
 
-                // Add the color
-                const cellColor = document.createElement('td');
-                cellColor.textContent = color || 'N/A';
-                tr.appendChild(cellColor);
+        // Add the item name
+        const cellName = document.createElement('td');
+        cellName.textContent = itemName || 'N/A';
+        tr.appendChild(cellName);
 
-                // Add the quantity
-                const cellQuantity = document.createElement('td');
-                cellQuantity.textContent = quantity || 'N/A';
-                tr.appendChild(cellQuantity);
+        // Add the color
+        const cellColor = document.createElement('td');
+        cellColor.textContent = color || 'N/A';
+        tr.appendChild(cellColor);
 
-                // Append the row to the table body
-                tableBody.appendChild(tr);
-            });
-        }
+        // Add the quantity
+        const cellQuantity = document.createElement('td');
+        cellQuantity.textContent = quantity || 'N/A';
+        tr.appendChild(cellQuantity);
 
-        // Update the page content on load
-        document.addEventListener('DOMContentLoaded', () => {
-            // Extract custom text (if any)
-            const customText = getQueryParameter('text');
-            if (customText) {
-                document.getElementById('custom-text').textContent = decodeURIComponent(customText);
-            }
-
-            // Extract the structured data for the table
-            const dataParam = getQueryParameter('data');
-            populateTable(dataParam);
-        });
-
+        // Append the row to the table body
+        tableBody.appendChild(tr);
+    });
+    
         // Function to generate PDF
         function generatePDF() {
             const { jsPDF } = window.jspdf;

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Table to PDF</title>
+    <style>
+        /* Styling for better PDF output */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        @media print {
+            /* Hide unnecessary elements during printing */
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Dynamic Table to PDF</h1>
+    <div class="content">
+        <p id="custom-text">This is the default text. Replace it with your custom text.</p>
+
+        <h2>Data Table</h2>
+        <table id="dynamic-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Column 1</th>
+                    <th>Column 2</th>
+                    <th>Column 3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be dynamically added here -->
+            </tbody>
+        </table>
+
+        <button class="no-print" onclick="generatePDF()">Download as PDF</button>
+    </div>
+
+    <!-- Include jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Function to extract query parameters from the URL
+        function getQueryParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Function to populate the table dynamically
+        function populateTable(column1Data, column2Data, column3Data) {
+            const tableBody = document.querySelector('#dynamic-table tbody');
+
+            // Clear any existing rows
+            tableBody.innerHTML = '';
+
+            // Convert the input strings into arrays
+            const col1 = column1Data ? column1Data.split(',') : [];
+            const col2 = column2Data ? column2Data.split(',') : [];
+            const col3 = column3Data ? column3Data.split(',') : [];
+
+            // Determine the maximum number of rows based on the longest column
+            const maxRows = Math.max(col1.length, col2.length, col3.length);
+
+            if (maxRows === 0) {
+                console.error('No data provided in the query parameters.');
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 4; // Span across all columns
+                cell.textContent = 'No data to display.';
+                row.appendChild(cell);
+                tableBody.appendChild(row);
+                return;
+            }
+
+            // Loop through the rows and create table rows
+            for (let i = 0; i < maxRows; i++) {
+                // Create a new table row
+                const tr = document.createElement('tr');
+
+                // Add the row number
+                const cellIndex = document.createElement('td');
+                cellIndex.textContent = i + 1;
+                tr.appendChild(cellIndex);
+
+                // Add the value from Column 1
+                const cellCol1 = document.createElement('td');
+                cellCol1.textContent = col1[i] || 'N/A';
+                tr.appendChild(cellCol1);
+
+                // Add the value from Column 2
+                const cellCol2 = document.createElement('td');
+                cellCol2.textContent = col2[i] || 'N/A';
+                tr.appendChild(cellCol2);
+
+                // Add the value from Column 3
+                const cellCol3 = document.createElement('td');
+                cellCol3.textContent = col3[i] || 'N/A';
+                tr.appendChild(cellCol3);
+
+                // Append the row to the table body
+                tableBody.appendChild(tr);
+            }
+        }
+
+        // Update the page content on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Extract the data for each column from the query parameters
+            const column1Data = getQueryParameter('column1');
+            const column2Data = getQueryParameter('column2');
+            const column3Data = getQueryParameter('column3');
+
+            console.log('Query Parameters:', { column1Data, column2Data, column3Data });
+
+            // Populate the table with the extracted data
+            populateTable(column1Data, column2Data, column3Data);
+        });
+
+        // Function to generate PDF
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+
+            // Create a new jsPDF instance
+            const doc = new jsPDF();
+
+            // Get the HTML content to convert
+            const content = document.querySelector('.content');
+
+            // Convert HTML to canvas using html2canvas
+            html2canvas(content).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210; // A4 width in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                // Add the image to the PDF
+                doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+                // Save the PDF with the correct filename and extension
+                doc.save('output.pdf'); // Ensure the file has a .pdf extension
+            }).catch(error => {
+                console.error('Error generating PDF:', error);
+            });
+        }
+    </script>
+    <!-- Include html2canvas library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</body>
+</html>

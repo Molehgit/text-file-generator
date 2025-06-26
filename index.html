@@ -1,32 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text File Generator</title>
+  <title>Thunkable List Viewer</title>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #list { margin-top: 20px; }
+    button { margin-top: 20px; }
+  </style>
 </head>
 <body>
-    <script>
-        function downloadFile() {
-            // Get URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const content = urlParams.get("content-data") || "No content provided";
-            const filename = urlParams.get("file-name") || "download.txt";
+  <h1>Received List</h1>
+  <pre id="list">Waiting for data...</pre>
+  <button onclick="downloadList()">Download List</button>
 
-            // Create a Blob
-            const blob = new Blob([decodeURIComponent(content)], { type: "text/plain" });
+  <script>
+    let listData = [];
 
-            // Create a link element
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+    // Get list from query parameter ?data=item1,item2,item3
+    const params = new URLSearchParams(window.location.search);
+    const dataParam = params.get("data");
+    if (dataParam) {
+      listData = decodeURIComponent(dataParam).split(",");
+    }
 
-        // Call function on page load
-        downloadFile();
-    </script>
+    // Show the list
+    const listElement = document.getElementById("list");
+    if (listData.length > 0) {
+      listElement.textContent = listData.join("\n");
+    }
+
+    // Download as txt
+    function downloadList() {
+      const blob = new Blob([listData.join("\n")], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "list.txt";
+      link.click();
+    }
+  </script>
 </body>
 </html>
+No content provided
